@@ -1,6 +1,10 @@
+import asyncio
 from datetime import datetime
 
 import streamlit as st
+
+from cover_letter_agent import generate_cover_letter_from_documents
+from helpers import extract_text_from_file
 
 
 def main():
@@ -30,7 +34,7 @@ def main():
     with col1:
         cv_file = st.file_uploader("CV (PDF/DOCX preferred)", type=["pdf", "docx", "txt", "md"], accept_multiple_files=False, key="cv")
     with col2:
-        other_files = st.file_uploader("Additional documents (optional) – multiple allowed", type=["pdf", "docx", "txt", "md"], accept_multiple_files=True, key="extras")
+        additional_docs = st.file_uploader("Additional documents (optional) – multiple allowed", type=["pdf", "docx", "txt", "md"], accept_multiple_files=True, key="extras")
 
     st.markdown("---")
     col_left, col_right = st.columns([1, 1])
@@ -44,7 +48,12 @@ def main():
         st.rerun()
 
     if generate_btn:
-        generated_text = ""
+        cv_text = extract_text_from_file(cv_file)
+        generated_text = asyncio.run(
+            generate_cover_letter_from_documents(
+                cv_text=cv_text, company_name=company_name, role=job_title, additional_docs=None
+            )
+        )
         st.markdown("### ✅ Generated Cover Letter")
         st.text_area("Result", value=generated_text, height=420)
 
