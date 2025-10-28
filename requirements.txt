@@ -1,4 +1,5 @@
 streamlit==1.50.0
 openai-agents==0.4.2
+langchain-community==0.4.1
 
 python-dotenv~=1.2.1
