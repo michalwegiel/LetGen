@@ -24,8 +24,10 @@ Guidelines:
    - Highlight how the candidate’s skills, experience, and achievements align with the company’s mission or initiatives.
    - Mention relevant projects, technologies, or leadership experience.
    - End with a polite, proactive closing.
+   - Signature.
 4. Keep it concise (max 4 paragraphs).
-5. Return only the final cover letter text — no explanations or markdown.
+5. Use Latin characters.
+6. Return only the final cover letter text — no explanations or markdown.
 """
 
 
