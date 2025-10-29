@@ -1,3 +1,5 @@
+from typing import Literal
+
 from agents import Agent, Runner, trace
 from dotenv import load_dotenv
 
@@ -27,29 +29,35 @@ Guidelines:
 """
 
 
-def _build_user_prompt(candidate_info, company_name, role):
+def _build_user_prompt(candidate_info, company_name, role, tone, length):
     return (
-        f"Generate a cover letter for {role} at {company_name}.\n"
+        f"Generate a {tone} cover letter for {role} at {company_name}.\n"
+        f"The letter should be {length} in length.\n"
         f"You can use the 'get_company_information' tool if you need to learn more about {company_name}.\n"
-        f"Candidate info:\n{candidate_info}"
+        f"Candidate details:\n{candidate_info}"
     )
 
 
-async def generate_cover_letter(candidate, company_name, role):
+async def generate_cover_letter(candidate, company_name, role, tone, length):
     agent = Agent(
-        name="Cover Letter Agent",
-        instructions=INSTRUCTIONS,
-        tools=[get_company_information],
-        model="gpt-5-nano"
+        name="Cover Letter Agent", instructions=INSTRUCTIONS, tools=[get_company_information], model="gpt-5-nano"
     )
-    result = await Runner.run(agent, _build_user_prompt(candidate.json(), company_name, role))
+    result = await Runner.run(agent, _build_user_prompt(candidate.json(), company_name, role, tone, length))
     return result.final_output
 
 
-async def generate_cover_letter_from_documents(cv_text: str, company_name: str, role: str, additional_docs: list[str] | None = None):
+async def generate_cover_letter_from_documents(
+    cv_text: str,
+    company_name: str,
+    role: str,
+    additional_docs: list[str] | None = None,
+    tone: Literal["Professional", "Confident", "Friendly", "Enthusiastic"] | None = "Professional",
+    length: (
+        Literal["Short (~180–250 words)", "Medium (~250–350 words)", "Long (~350–500 words)"] | None
+    ) = "Medium (~250–350 words)",
+):
     with trace("LetGen"):
         candidate = await extract_candidate_data(cv_text, additional_docs)
-        cover_letter = await generate_cover_letter(candidate, company_name, role)
+        cover_letter = await generate_cover_letter(candidate, company_name, role, tone, length)
 
-    print(candidate)
     return cover_letter
