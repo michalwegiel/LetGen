@@ -1,6 +1,7 @@
 import re
-from pywin.mfc.docview import Document
+
 from pypdf import PdfReader
+from pywin.mfc.docview import Document
 
 
 def extract_text_from_pdf(file):
