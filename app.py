@@ -1,5 +1,4 @@
 import asyncio
-from datetime import datetime
 
 import streamlit as st
 
@@ -27,7 +26,7 @@ def main():
     company_name = st.text_input("Company Name", placeholder="e.g. Arasaka")
 
     st.markdown("### 📤 Upload your documents")
-    st.write("Upload your **CV** and any **additional files** (job description, summary, notes). Supports PDF, DOCX, TXT, MD.")
+    st.write("Upload your **CV** and any **additional files** (job description, summary, notes). Supports PDF, DOCX, TXT.")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -47,30 +46,27 @@ def main():
         st.rerun()
 
     if generate_btn:
-        cv_text = extract_text_from_file(cv_file)
-        additional_docs = [extract_text_from_file(doc) for doc in additional_docs] if additional_docs else None
-        generated_text = asyncio.run(
-            generate_cover_letter_from_documents(
-                cv_text=cv_text,
-                company_name=company_name,
-                role=job_title,
-                additional_docs=additional_docs,
-                tone=tone,
-                length=length_choice
+        with st.spinner("Writing Cover Letter... this may take up to a minute ⏳"):
+            cv_text = extract_text_from_file(cv_file)
+            additional_docs = [extract_text_from_file(doc) for doc in additional_docs] if additional_docs else None
+            generated_text = asyncio.run(
+                generate_cover_letter_from_documents(
+                    cv_text=cv_text,
+                    company_name=company_name,
+                    role=job_title,
+                    additional_docs=additional_docs,
+                    tone=tone,
+                    length=length_choice
+                )
             )
-        )
-        st.markdown("### ✅ Generated Cover Letter")
-        st.text_area("Result", value=generated_text, height=420)
+            st.markdown("### ✅ Generated Cover Letter")
+            st.text_area("Result", value=generated_text, height=420)
 
-
-        docx_bytes = b""
-        fname = f"cover_letter_{company_name or 'company'}_{datetime.now().strftime('%Y%m%d')}.docx".replace(" ", "_")
         st.download_button(
-            "⬇️ Download DOCX",
-            data=docx_bytes,
-            file_name=fname,
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            use_container_width=True
+            label="⬇️ Download TXT",
+            data=generated_text,
+            file_name="cover_letter.txt",
+            mime="application/txt"
         )
 
 
